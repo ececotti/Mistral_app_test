@@ -54,7 +54,12 @@ app.post('/api/chat', async (req, res) => {
             .join('');
     res.json({ reply });
   } catch (err) {
-    console.error('Mistral API error:', err);
+    const status = (err as { statusCode?: number })?.statusCode;
+    if (status === 401) {
+      console.error('Mistral API rejected the key (401). Check MISTRAL_API_KEY in .env (single line, no spaces) and restart the server.');
+    } else {
+      console.error('Mistral API error:', err);
+    }
     res.status(502).json({ error: 'the Mistral API request failed' });
   }
 });
